@@ -1,4 +1,5 @@
 //jshint esversion:6
+require('dotenv').config()
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
@@ -21,8 +22,7 @@ const userSchema = new mongoose.Schema({
     password: String
 });
 
-const secret = "ThisIsOurLittleSecret";
-userSchema.plugin(encrypt, {secret: secret, encryptedFields: ['password']});    // adding the encrypt package as a plugin.
+userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['password']});    // adding the encrypt package as a plugin.
                                     // addding encryptedFields so that it don't encrypt the entire database.
 const User = mongoose.model("User", userSchema);
 
@@ -66,8 +66,8 @@ app.post("/login", (req, res)=>{
                     res.send("Please enter correct username or password");
             }
             else 
-                console.log(err);
-    })
+                res.send(err);
+    });
 });
 
 

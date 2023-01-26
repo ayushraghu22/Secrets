@@ -40,7 +40,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/userDB", ()=>{
 const userSchema = new mongoose.Schema({
     username: String,
     password: String,
-    googleId: String
+    googleId: String,
+    secret: String
 });
 
 // userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ['password']});    // adding the encrypt package as a plugin.
@@ -103,10 +104,12 @@ app.get("/register", (req, res)=>{
 });
 
 app.get("/secrets", (req, res)=>{
-    if(req.isAuthenticated())
-        res.render("secrets");
-    else 
-        res.redirect("/login");
+   User.find({secret: {$ne:null}}, (err, foundUsers)=>{
+    if(err) console.log(err);
+    else{
+        res.render("secrets", {usersWithSecret: foundUsers});
+    }
+   });
 });
 
 app.get("/submit", (req,res)=>{
@@ -117,7 +120,22 @@ app.get("/submit", (req,res)=>{
 });
 
 app.post("/submit", (req, res)=>{
+    const submittedSecret = req.body.secret;
+    // console.log(req.user.id);
 
+    User.findById(req.user.id, (err, foundUser)=>{
+        if(err)
+            console.log(err);
+        else{
+            if(foundUser){
+                foundUser.secret = submittedSecret;
+                foundUser.save((err)=>{
+                    if(err) console.log(err);
+                    else res.redirect("/secrets");
+                });
+            }
+        }
+    });
 });
 
 app.get("/logout", (req, res)=>{
@@ -130,6 +148,7 @@ app.get("/logout", (req, res)=>{
 });
 
 app.post("/register", (req, res)=>{
+    // User.register() also looks whether there is an already existing username.
     User.register({username: req.body.username}, req.body.password, (err, user)=>{
         if(err)
             console.log(err);

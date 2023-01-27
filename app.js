@@ -72,7 +72,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/secrets",
+    callbackURL: process.env.CYCLIC_URL+"/auth/google/secrets",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"  // Adding this because google has sunsetted the google+, and 
   },                                                                 // this package relied on google+.
   function(accessToken, refreshToken, profile, cb) {
@@ -86,7 +86,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.CLIENT_ID_FB,
     clientSecret: process.env.CLIENT_SECRET_FB,
-    callbackURL: "http://localhost:3000/auth/facebook/secrets"
+    callbackURL: process.env.CYCLIC_URL+"/auth/facebook/secrets"
   },
   function(accessToken, refreshToken, profile, cb) {
     User.findOrCreate({ facebookId: profile.id }, function (err, user) {

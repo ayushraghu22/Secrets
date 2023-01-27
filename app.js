@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
+const PORT = process.env.PORT;
 
 const session = require('express-session');
 const passport = require("passport");
@@ -34,7 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1:27017/userDB", ()=>{
+mongoose.connect(process.env.DB_URL, ()=>{
     console.log("Connected with database");
 });
 
@@ -75,7 +76,7 @@ passport.use(new GoogleStrategy({
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"  // Adding this because google has sunsetted the google+, and 
   },                                                                 // this package relied on google+.
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
+    // console.log(profile);
     User.findOrCreate({ googleId: profile.id }, function (err, user) {
       return cb(err, user); 
     });
@@ -203,7 +204,7 @@ app.post("/login", (req, res)=>{
 });
 
 
-app.listen(3000, ()=>{
+app.listen(PORT || 3000, ()=>{
     console.log("Server is running on port 3000");
 })
 
